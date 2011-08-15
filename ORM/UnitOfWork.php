@@ -178,7 +178,7 @@ class UnitOfWork implements PropertyChangedListener
      *
      * @var Doctrine\ORM\EntityManager
      */
-    private $em;
+    protected $em;
 
     /**
      * The calculator used to calculate the order in which changes to
