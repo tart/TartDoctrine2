@@ -656,11 +656,6 @@ LEFT JOIN all_cons_columns r_cols
         return 'Y-m-d H:i:sP';
     }
 
-    public function getDateFormatString()
-    {
-        return 'Y-m-d 00:00:00';
-    }
-
     public function getTimeFormatString()
     {
         return '1900-01-01 H:i:s';
