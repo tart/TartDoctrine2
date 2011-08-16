@@ -73,7 +73,7 @@ class EntityManager implements ObjectManager
      *
      * @var Doctrine\ORM\UnitOfWork
      */
-    private $unitOfWork;
+    protected $unitOfWork;
 
     /**
      * The event manager that is the central point of the event system.
