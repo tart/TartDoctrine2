@@ -43,7 +43,7 @@ class OCI8Connection implements \Doctrine\DBAL\Driver\Connection
             define('OCI_NO_AUTO_COMMIT', 0);
         }
 
-        $this->_dbh = @oci_connect($username, $password, $db, $charset, $sessionMode);
+        $this->_dbh = @oci_pconnect($username, $password, $db, $charset, $sessionMode);
         if (!$this->_dbh) {
             throw OCI8Exception::fromErrorInfo(oci_error());
         }
