@@ -33,12 +33,15 @@ class Driver implements \Doctrine\DBAL\Driver
 {
     public function connect(array $params, $username = null, $password = null, array $driverOptions = array())
     {
+        $isPersistent = (isset($params['persistent']) && $params['persistent'] == true);
+        
         return new OCI8Connection(
             $username,
             $password,
             $this->_constructDsn($params),
             isset($params['charset']) ? $params['charset'] : null,
-            isset($params['sessionMode']) ? $params['sessionMode'] : OCI_DEFAULT
+            isset($params['sessionMode']) ? $params['sessionMode'] : OCI_DEFAULT,
+            $isPersistent
         );
     }
 
