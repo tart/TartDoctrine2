@@ -846,6 +846,25 @@ class Builder
         $this->expr->addOr($expression);
         return $this;
     }
+    
+    /**
+     * Adds an "and" expression to the current query.
+     *
+     * You can create the expression using the expr() method:
+     *
+     *     $qb = $this->createQueryBuilder('User');
+     *     $qb
+     *         ->addAnd($qb->expr()->field('first_name')->equals('Orkun'))
+     *         ->addAnd($qb->expr()->field('first_surname')->equals('Balkanci'));
+     *
+     * @param array|QueryBuilder $expression
+     * @return Query
+     */
+    public function addAnd($expression)
+    {
+        $this->expr->addAnd($expression);
+        return $this;
+    }
 
     /**
      * Adds an "elemMatch" expression to the current query.
