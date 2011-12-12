@@ -513,7 +513,11 @@ class DocumentPersister
                 $data = $this->hydratorFactory->hydrate($embeddedDocumentObject, $embeddedDocument);
                 $this->uow->registerManaged($embeddedDocumentObject, null, $data);
                 $this->uow->setParentAssociation($embeddedDocumentObject, $mapping, $owner, $mapping['name'].'.'.$key);
-                $collection->add($embeddedDocumentObject);
+                if ($mapping['strategy'] === 'set') {
+                    $collection->set($key, $embeddedDocumentObject);
+                } else {
+                    $collection->add($embeddedDocumentObject);
+                }
             }
         }
     }
@@ -523,12 +527,16 @@ class DocumentPersister
         $mapping = $collection->getMapping();
         $cmd = $this->cmd;
         $groupedIds = array();
-        foreach ($collection->getMongoData() as $reference) {
+        foreach ($collection->getMongoData() as $key => $reference) {
             $className = $this->dm->getClassNameFromDiscriminatorValue($mapping, $reference);
             $mongoId = $reference[$cmd . 'id'];
             $id = (string) $mongoId;
             $reference = $this->dm->getReference($className, $id);
-            $collection->add($reference);
+            if ($mapping['strategy'] === 'set') {
+                $collection->set($key, $reference);
+            } else {
+                $collection->add($reference);
+            }
             if ($reference instanceof Proxy && ! $reference->__isInitialized__) {
                 if ( ! isset($groupedIds[$className])) {
                     $groupedIds[$className] = array();
@@ -665,25 +673,37 @@ class DocumentPersister
             $e = explode('.', $fieldName);
 
             $mapping = $this->class->getFieldMapping($e[0]);
-
-            if ($this->class->hasField($e[0])) {
-                $name = $this->class->fieldMappings[$e[0]]['name'];
-                if ($name !== $e[0]) {
-                    $e[0] = $name;
-                }
+            $name = $mapping['name'];
+            if ($name !== $e[0]) {
+                $e[0] = $name;
             }
 
             if (isset($mapping['targetDocument'])) {
                 $targetClass = $this->dm->getClassMetadata($mapping['targetDocument']);
                 if ($targetClass->hasField($e[1])) {
                     if ($targetClass->identifier === $e[1]) {
-                        $fieldName = $e[0] . '.$id';
+                        $fieldName =  $e[0] . '.$id';
                         if (is_array($value)) {
                             foreach ($value as $k => $v) {
                                 $value[$k] = $targetClass->getDatabaseIdentifierValue($v);
                             }
                         } else {
                             $value = $targetClass->getDatabaseIdentifierValue($value);
+                        }
+
+                    } else {
+                        $targetMapping = $targetClass->getFieldMapping($e[1]);
+                        $targetName = $targetMapping['name'];
+                        if ($targetName !== $e[1]) {
+                            $e[1] = $targetName;
+                        }
+                        $fieldName =  $e[0] . '.' . $e[1];
+
+                        if(count($e) > 2) {
+                            unset($e[0], $e[1]);
+                            $key = implode('.', $e);
+                            $value = $this->prepareQueryValue($key, $value);
+                            $fieldName .= '.' . $key;
                         }
                     }
                 }
