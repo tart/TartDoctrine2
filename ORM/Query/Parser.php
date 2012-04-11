@@ -2732,6 +2732,13 @@ class Parser
                 if ($this->_lexer->isNextToken(Lexer::T_EQUALS)) {
                     $this->match(Lexer::T_EQUALS);
                     $operator .= '=';
+                } else if ($this->_lexer->isNextToken(Lexer::T_GREATER_THAN)) {
+                    $this->match(Lexer::T_GREATER_THAN);
+                    $operator .= '>';
+                    if ($this->_lexer->isNextToken(Lexer::T_EQUALS)) {
+                        $this->match(Lexer::T_EQUALS);
+                        $operator .= '=';  
+                    }
                 }
 
                 return $operator;
