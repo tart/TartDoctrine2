@@ -369,11 +369,9 @@ class Table extends AbstractAsset
         $columnName = $column->getName();
         $columnName = strtolower($columnName);
 
-        if (isset($this->_columns[$columnName])) {
-            throw SchemaException::columnAlreadyExists($this->getName(), $columnName);
+        if (!isset($this->_columns[$columnName])) {
+            $this->_columns[$columnName] = $column;
         }
-
-        $this->_columns[$columnName] = $column;
     }
 
     /**
